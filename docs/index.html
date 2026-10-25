@@ -383,13 +383,10 @@ textarea{min-height:70px;resize:vertical}
 
 <section id="login" class="hidden" style="max-width:420px;margin:14vh auto 0;padding:0 22px">
   <h1 style="font-family:'Chakra Petch',sans-serif;font-size:38px;margin:0 0 6px">Agyeman</h1>
-  <p class="note">Inserisci la tua email: ricevi un codice da inserire qui sotto.</p>
-  <input type="email" id="email" autocomplete="email" placeholder="nome@esempio.it" style="width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px">
-  <p><button class="btn" id="send-link" type="button">Invia codice di accesso</button></p>
-  <div id="otp-box" class="hidden">
-    <input type="text" id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Codice ricevuto via email" style="width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:20px;letter-spacing:.2em;text-align:center">
-    <p><button class="btn" id="otp-go" type="button">Accedi</button></p>
-  </div>
+  <p class="note">Accedi con l’email e la password del tuo utente Supabase.</p>
+  <input type="email" id="email" autocomplete="username" placeholder="nome@esempio.it" style="width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px">
+  <input type="password" id="pwd" autocomplete="current-password" placeholder="Password" style="width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px">
+  <p><button class="btn" id="send-link" type="button">Accedi</button></p>
   <div class="msg" id="login-msg"></div>
 </section>
 <div class="app hidden" id="app">
@@ -1870,23 +1867,14 @@ function setSession(session) {
   if (!logged) started = false;
 }
 $("#send-link").addEventListener("click", async () => {
-  const email = $("#email").value.trim(); if (!email) return;
+  const email = $("#email").value.trim(), password = $("#pwd").value;
+  if (!email || !password) return;
   $("#send-link").disabled = true;
-  const {error} = await db.auth.signInWithOtp({email, options: {emailRedirectTo: location.origin + location.pathname, shouldCreateUser: false}});
+  const {error} = await db.auth.signInWithPassword({email, password});
   $("#send-link").disabled = false;
-  if (error) { $("#login-msg").textContent = "Invio non riuscito: " + error.message; return; }
-  $("#otp-box").classList.remove("hidden"); $("#otp").focus();
-  $("#login-msg").textContent = "Email inviata: inserisci il codice qui sopra (controlla anche lo spam).";
+  $("#login-msg").textContent = error ? "Accesso non riuscito: email o password errate." : "";
 });
-$("#otp-go").addEventListener("click", async () => {
-  const email = $("#email").value.trim(), token = $("#otp").value.replace(/\s/g, "");
-  if (!email || !token) return;
-  $("#otp-go").disabled = true;
-  const {error} = await db.auth.verifyOtp({email, token, type: "email"});
-  $("#otp-go").disabled = false;
-  if (error) $("#login-msg").textContent = "Codice non valido o scaduto: richiedine uno nuovo.";
-});
-$("#otp").addEventListener("keydown", e => { if (e.key === "Enter") $("#otp-go").click(); });
+$("#pwd").addEventListener("keydown", e => { if (e.key === "Enter") $("#send-link").click(); });
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState !== "visible" || !started) return;
   if (iso(new Date()) !== today) return location.reload();
