@@ -127,6 +127,15 @@ textarea{min-height:70px;resize:vertical}
 .tabbar button[aria-selected="true"]{color:var(--text);background:var(--surface-2)}
 .tabbar button[aria-selected="true"] svg{stroke:var(--rec);filter:drop-shadow(0 0 4px var(--rec))}
 .hidden{display:none!important}
+.voicebar{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.voicebar button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer}
+.voicebar button[aria-pressed="true"]{background:var(--rec);color:var(--on-rec);border-color:transparent}
+.mic{flex:none;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);display:grid;place-items:center;cursor:pointer;align-self:flex-end}
+.mic svg{width:22px;height:22px;fill:none;stroke:var(--text);stroke-width:2;stroke-linecap:round}
+.mic[aria-pressed="true"]{background:var(--rhr);border-color:transparent;animation:micpulse 1.2s infinite}
+.mic[aria-pressed="true"] svg{stroke:#fff}
+@keyframes micpulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--rhr) 60%,transparent)}100%{box-shadow:0 0 0 14px transparent}}
+@media (prefers-reduced-motion: reduce){.mic[aria-pressed="true"]{animation:none}}
 .srcline{font-size:12.5px;color:var(--muted);margin:-4px 0 10px}
 .srcline b{color:var(--text)}
 .today-s{border:1px solid color-mix(in srgb,var(--rec) 45%,transparent);border-radius:16px;padding:12px;background:color-mix(in srgb,var(--rec) 6%,transparent)}
@@ -502,8 +511,10 @@ textarea{min-height:70px;resize:vertical}
   <section class="view" id="v-coach">
     <div class="chat" id="chat"></div>
     <div class="chips" id="chips"></div>
+    <div class="voicebar"><button type="button" id="tts" aria-pressed="false">Risposte a voce</button><span class="note" id="voice-msg"></span></div>
     <div class="composer">
-      <textarea id="q" rows="1" placeholder="Chiedi o fai creare task e appuntamenti"></textarea>
+      <button type="button" class="mic" id="mic" aria-label="Parla con l’assistente" aria-pressed="false"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+      <textarea id="q" rows="1" placeholder="Chiedi qualcosa"></textarea>
       <button class="btn" id="ask" type="button">Invia</button>
     </div>
   </section>
@@ -1512,7 +1523,7 @@ function bindDietForm() {
 
 /* ---------- Coach ---------- */
 const SYSTEM = `Sei il coach personale di benessere di un atleta amatoriale che si allena per HYROX e per la corsa, seguito da un trainer.
-Lavori dentro l'app personale Agyeman e sei anche il suo assistente personale: agenda, task, bollette, posta di lavoro. Puoi creare task e appuntamenti e segnare bollette pagate con gli strumenti a disposizione, solo quando te lo chiede o lo conferma. Rispondi in italiano, diretto e concreto, senza frasi di cortesia e senza emoji. Usa elenchi puntati solo quando servono.
+Lavori dentro l'app personale Agyeman e sei anche il suo assistente personale: agenda, task, bollette, posta di lavoro. Puoi creare task e appuntamenti e segnare bollette pagate con gli strumenti a disposizione, solo quando te lo chiede o lo conferma. Le domande possono arrivare dettate a voce: interpreta eventuali errori di trascrizione. Rispondi in italiano, diretto e concreto, senza frasi di cortesia e senza emoji. Usa elenchi puntati solo quando servono.
 Hai i suoi dati Garmin (HRV notturna RMSSD, FC a riposo, sonno, Body Battery, stress, allenamenti), il recovery calcolato dall'app.
 Regole: basati sui numeri forniti citando date e valori; se i dati non bastano dillo. Distingui correlazione e causa e segnala quando i casi sono pochi.
 Leggi l'HRV rispetto alla baseline personale. Per meditazione, respirazione, sonno, nutrizione e recupero dai protocolli pratici basati su evidenze (durata, orario, frequenza).
@@ -1598,14 +1609,62 @@ async function ask(qText) {
     out.classList.remove("wait"); out.innerHTML = md(text);
     HISTORY.push({role: "user", content: q}, {role: "assistant", content: text});
     persist.chat(q, text);
+    speak(text);
   } catch (e) {
     out.classList.remove("wait");
     out.innerHTML = (e && e.text ? md(e.text) : "") + `<p>${esc(errorCopy(e && e.code))}</p>`;
   } finally { busy = false; $("#ask").disabled = false; }
 }
-$("#chips").innerHTML = SUGGEST.map(s => `<button type="button">${s}</button>`).join("");
-$("#chips").querySelectorAll("button").forEach(b => b.addEventListener("click", () => ask(b.textContent)));
+$("#chips").classList.add("hidden");
 $("#ask").addEventListener("click", () => ask());
+
+/* ---------- voce: dettatura e risposte lette ad alta voce ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, listening = false;
+let TTS_ON = false;
+try { TTS_ON = localStorage.getItem("agyeman-tts") === "1"; } catch (e) {}
+const voiceMsg = t => { $("#voice-msg").textContent = t || ""; };
+function setTTS(on) {
+  TTS_ON = on; $("#tts").setAttribute("aria-pressed", on);
+  try { localStorage.setItem("agyeman-tts", on ? "1" : "0"); } catch (e) {}
+  if (on && window.speechSynthesis) { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); }   // sblocca l'audio su iPhone
+  if (!on && window.speechSynthesis) speechSynthesis.cancel();
+}
+function plain(md) { return String(md).replace(/[*_#`>]/g, "").replace(/^\s*[-•]\s+/gm, "").replace(/\n{2,}/g, ". ").replace(/\n/g, ", "); }
+function speak(text) {
+  if (!TTS_ON || !window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(plain(text));
+  u.lang = "it-IT"; u.rate = 1.05;
+  const v = speechSynthesis.getVoices().find(x => /^it/i.test(x.lang)); if (v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+function stopListening() { listening = false; $("#mic").setAttribute("aria-pressed", "false"); }
+function startListening() {
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  if (!SR) { voiceMsg("Dettatura non disponibile qui: usa il microfono della tastiera dell’iPhone."); $("#q").focus(); return; }
+  rec = new SR(); rec.lang = "it-IT"; rec.interimResults = true; rec.continuous = false;
+  let finalText = "";
+  rec.onresult = e => {
+    let interim = "";
+    for (let i = e.resultIndex; i < e.results.length; i++) { const r = e.results[i]; if (r.isFinal) finalText += r[0].transcript + " "; else interim += r[0].transcript; }
+    $("#q").value = (finalText + interim).trim();
+  };
+  rec.onerror = e => {
+    stopListening();
+    if (e.error === "not-allowed" || e.error === "service-not-allowed") voiceMsg("Microfono non autorizzato: consenti l’accesso, oppure usa il microfono della tastiera.");
+    else if (e.error !== "no-speech" && e.error !== "aborted") voiceMsg("Dettatura interrotta, riprova.");
+  };
+  rec.onend = () => { const was = listening; stopListening(); if ($("#voice-msg").textContent === "Ti ascolto...") voiceMsg(""); if (was && $("#q").value.trim()) ask(); };
+  try { rec.start(); listening = true; $("#mic").setAttribute("aria-pressed", "true"); voiceMsg("Ti ascolto..."); }
+  catch (err) { stopListening(); voiceMsg("Dettatura non disponibile: usa il microfono della tastiera."); }
+}
+$("#mic").addEventListener("click", () => {
+  if (listening && rec) { rec.stop(); return; }
+  voiceMsg(""); startListening();
+});
+$("#tts").addEventListener("click", () => setTTS(!TTS_ON));
+$("#tts").setAttribute("aria-pressed", TTS_ON);
 $("#q").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !("ontouchstart" in window)) { e.preventDefault(); ask(); } });
 bubble("assistant", md("Sono il tuo assistente. Vedo salute, allenamenti, pasti, agenda, task, bollette e posta di lavoro . Chiedimi qualsiasi cosa, oppure dimmi di creare un task o un appuntamento."));
 
