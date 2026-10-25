@@ -11,8 +11,11 @@ from garminconnect import Garmin
 
 TZ = ZoneInfo("Europe/Rome")
 DAYS = int(os.environ.get("DAYS", "3"))
-SUPA_URL = os.environ["SUPABASE_URL"].rstrip("/")
-SUPA_KEY = os.environ["SUPABASE_SECRET_KEY"]
+SUPA_URL = os.environ["SUPABASE_URL"].strip().rstrip("/")
+if not SUPA_URL.startswith("http"):
+    SUPA_URL = "https://" + SUPA_URL
+SUPA_KEY = os.environ["SUPABASE_SECRET_KEY"].strip()
+
 
 
 # ---------- utilità ----------
