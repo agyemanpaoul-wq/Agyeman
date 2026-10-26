@@ -127,6 +127,18 @@ textarea{min-height:70px;resize:vertical}
 .tabbar button[aria-selected="true"]{color:var(--text);background:var(--surface-2)}
 .tabbar button[aria-selected="true"] svg{stroke:var(--rec);filter:drop-shadow(0 0 4px var(--rec))}
 .hidden{display:none!important}
+.form{display:grid;gap:10px}
+.fl{display:grid;gap:4px;font-size:12.5px;color:var(--muted);font-weight:600}
+.fl input,.fl select,.fl textarea{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:16px;color:var(--text);font-weight:500}
+.fl.chk{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--text)}
+.fl.chk input{width:22px;height:22px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.facts{display:grid;grid-template-columns:2fr 1fr;gap:8px;margin-top:16px}
+.btn.danger{color:var(--rhr)}
+.addrow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+.addrow .btn{padding:10px 6px;font-size:13.5px}
+[data-et],[data-ee],[data-eb],[data-em]{cursor:pointer}
+.newb{border:0;background:none;color:var(--rec);font-weight:800;font-size:13px;cursor:pointer;padding:4px 0}
 .sect{font-size:17px;font-weight:700;margin:20px 2px 10px}
 .askbar{position:fixed;left:14px;right:14px;bottom:calc(118px + env(safe-area-inset-bottom,0px));z-index:19;max-width:452px;margin:0 auto;display:flex;align-items:center;gap:6px;padding:5px;border:1px solid var(--line);border-radius:999px;background:color-mix(in srgb,var(--solid) 88%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 8px 24px rgba(0,0,0,.18)}
 .askbar input{flex:1;min-width:0;border:0;background:none;padding:10px 4px;font-size:15.5px;outline:none}
@@ -165,6 +177,7 @@ textarea{min-height:70px;resize:vertical}
 .mic svg{width:22px;height:22px;fill:none;stroke:var(--text);stroke-width:2;stroke-linecap:round}
 .mic[aria-pressed="true"]{background:var(--rhr);border-color:transparent;animation:micpulse 1.2s infinite}
 .mic[aria-pressed="true"] svg{stroke:#fff}
+.mic.tts{width:40px;height:40px;align-self:center}.mic.tts[aria-pressed="true"]{background:var(--rec);animation:none}.mic.tts[aria-pressed="true"] svg{stroke:var(--on-rec)}.mic.tts svg{width:19px;height:19px}
 @keyframes micpulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--rhr) 60%,transparent)}100%{box-shadow:0 0 0 14px transparent}}
 @media (prefers-reduced-motion: reduce){.mic[aria-pressed="true"]{animation:none}}
 .srcline{font-size:12.5px;color:var(--muted);margin:-4px 0 10px}
@@ -480,6 +493,7 @@ textarea{min-height:70px;resize:vertical}
     <div class="card">
       <h2>Aggiungi alla giornata</h2>
       <div class="ask-row"><input type="text" id="nl" placeholder="Es. call con Rossi martedì alle 15, o ricordami di chiamare il pediatra" aria-label="Nuovo task o appuntamento"><button class="btn" type="button" id="nl-go">Aggiungi</button></div>
+      <div class="addrow"><button class="btn sec" type="button" data-new="task:life">+ Task</button><button class="btn sec" type="button" data-new="event:work">+ Impegno</button><button class="btn sec" type="button" data-new="bill:life">+ Bolletta</button></div>
       <div class="msg" id="nl-msg"></div>
     </div>
     <div class="card" id="agenda"></div>
@@ -531,6 +545,7 @@ textarea{min-height:70px;resize:vertical}
         <input type="file" id="photo" accept="image/*" capture="environment" class="hidden">
         <button class="btn sec" type="button" id="text-btn">Descrivi a parole</button>
       </div>
+      <button class="btn sec" type="button" data-new="meal:" style="margin-top:8px">Inserisci a mano kcal e macro</button>
       <div id="text-box" class="hidden" style="margin-top:10px">
         <textarea id="meal-text" placeholder="Es. 80 g di pasta al pomodoro con parmigiano, insalata con un cucchiaio d’olio"></textarea>
         <button class="btn" type="button" id="text-go" style="margin-top:8px">Calcola</button>
@@ -547,8 +562,9 @@ textarea{min-height:70px;resize:vertical}
   <section class="view" id="v-coach">
     <div class="chat" id="chat"></div>
     <div class="chips" id="chips"></div>
-    <div class="voicebar"><button type="button" id="tts" aria-pressed="false">Risposte a voce</button><span class="note" id="voice-msg"></span></div>
+    <span id="voice-msg" class="hidden"></span>
     <div class="composer">
+      <button type="button" class="mic tts" id="tts" aria-pressed="false" aria-label="Risposte lette ad alta voce"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
       <button type="button" class="mic" id="mic" aria-label="Parla con l’assistente" aria-pressed="false"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
       <textarea id="q" rows="1" placeholder="Chiedi qualcosa"></textarea>
       <button class="btn" id="ask" type="button">Invia</button>
@@ -916,13 +932,13 @@ function evHTML(list, withTag) {
   if (!list.length) return `<p class="note">Nessun appuntamento.</p>`;
   const byDay = {}; list.forEach(e => (byDay[dayOf(e.start)] ||= []).push(e));
   return Object.entries(byDay).map(([d, l]) => `<div class="dayh">${fmtDay(d)}</div>` +
-    l.map(e => `<div class="ev"><div class="tm">${hhmm(e.start)}</div><div class="bd ${e.src === "Agyeman" ? "ag" : ""}"><div class="t">${withTag ? tag(e.area) : ""}${esc(e.title)}</div><div class="l">${hhmm(e.start)}-${hhmm(e.end)}${e.location ? ", " + esc(e.location) : ""}, ${e.src}</div></div></div>`).join("")).join("");
+    l.map(e => `<div class="ev" data-ee="${e.id}"><div class="tm">${hhmm(e.start)}</div><div class="bd ${e.src === "Agyeman" ? "ag" : ""}"><div class="t">${withTag ? tag(e.area) : ""}${esc(e.title)}</div><div class="l">${hhmm(e.start)}-${hhmm(e.end)}${e.location ? ", " + esc(e.location) : ""}, ${e.src}</div></div></div>`).join("")).join("");
 }
 function taskHTML(list, withTag) {
   const open = list.filter(t => !t.done).sort((a, b) => (a.due || "9999") < (b.due || "9999") ? -1 : 1), closed = list.filter(t => t.done);
   const row = t => { const late = t.due && t.due < today && !t.done;
     return `<div class="task ${t.done ? "done" : ""}"><button class="chk" type="button" data-t="${t.id}" aria-pressed="${t.done}" aria-label="Completa ${esc(t.title)}"></button>
-      <div><div class="t">${withTag ? tag(t.area) : ""}${esc(t.title)}</div><div class="m ${late ? "late" : ""}">${t.due ? (late ? "Scaduto " : "Entro ") + fmtDay(t.due).toLowerCase() : "Senza scadenza"}${t.remind ? ", promemoria " + hhmm(t.remind) : ""}, ${t.src}</div></div></div>`; };
+      <div data-et="${t.id}"><div class="t">${withTag ? tag(t.area) : ""}${esc(t.title)}</div><div class="m ${late ? "late" : ""}">${t.due ? (late ? "Scaduto " : "Entro ") + fmtDay(t.due).toLowerCase() : "Senza scadenza"}${t.remind ? ", promemoria " + hhmm(t.remind) : ""}, ${t.src}</div></div></div>`; };
   return (open.length ? open.map(row).join("") : `<p class="note">Nessun task aperto.</p>`) +
     (closed.length ? `<details style="margin-top:8px"><summary class="note" style="cursor:pointer">${closed.length} completati</summary>${closed.map(row).join("")}</details>` : "");
 }
@@ -959,14 +975,14 @@ function renderAgenda() {
     <div><div class="k">Task aperti</div><div class="x">${wt.filter(t => !t.done).length}</div></div>
     <div><div class="k">Impegni oggi</div><div class="x">${wToday}</div></div>
     <div><div class="k">Impegni 7 giorni</div><div class="x">${ev.filter(work).length}</div></div></div>`;
-  $("#work-events").innerHTML = `<h2>Impegni di lavoro, 7 giorni</h2>` + evHTML(ev.filter(work), false);
-  $("#work-tasks").innerHTML = `<div class="sec-h"><h2>Task di lavoro</h2><span class="note">${wt.filter(t => !t.done).length} aperti</span></div>` + taskHTML(wt, false);
-  $("#life-events").innerHTML = `<h2>Impegni privati, 7 giorni</h2>` + evHTML(ev.filter(life), false);
-  $("#life-tasks").innerHTML = `<div class="sec-h"><h2>Task privati</h2><span class="note">${lt.filter(t => !t.done).length} aperti</span></div>` + taskHTML(lt, false);
+  $("#work-events").innerHTML = `<div class="sec-h"><h2>Impegni di lavoro, 7 giorni</h2><button class="newb" type="button" data-new="event:work">+ Nuovo</button></div>` + evHTML(ev.filter(work), false);
+  $("#work-tasks").innerHTML = `<div class="sec-h"><h2>Task di lavoro</h2><button class="newb" type="button" data-new="task:work">+ Nuovo</button></div>` + taskHTML(wt, false);
+  $("#life-events").innerHTML = `<div class="sec-h"><h2>Impegni privati, 7 giorni</h2><button class="newb" type="button" data-new="event:life">+ Nuovo</button></div>` + evHTML(ev.filter(life), false);
+  $("#life-tasks").innerHTML = `<div class="sec-h"><h2>Task privati</h2><button class="newb" type="button" data-new="task:life">+ Nuovo</button></div>` + taskHTML(lt, false);
 
   // AGENDA: tutto
-  $("#agenda").innerHTML = `<h2>Prossimi 7 giorni</h2>` + evHTML(ev, true);
-  $("#tasks").innerHTML = `<div class="sec-h"><h2>Task e promemoria</h2><span class="note">${AG.tasks.filter(t => !t.done).length} aperti</span></div>` + taskHTML(AG.tasks, true);
+  $("#agenda").innerHTML = `<div class="sec-h"><h2>Prossimi 7 giorni</h2><button class="newb" type="button" data-new="event:work">+ Nuovo</button></div>` + evHTML(ev, true);
+  $("#tasks").innerHTML = `<div class="sec-h"><h2>Task e promemoria</h2><button class="newb" type="button" data-new="task:life">+ Nuovo</button></div>` + taskHTML(AG.tasks, true);
   ["#work-tasks", "#life-tasks", "#tasks"].forEach(id => bindChecks($(id)));
 
   // LIFE: bollette
@@ -974,14 +990,14 @@ function renderAgenda() {
   const toPay = bills.filter(b => b.status === "da pagare" && b.due <= addDays(today, 30)).reduce((s, b) => s + b.amount, 0);
   const auto = bills.filter(b => b.status === "domiciliata" && b.due >= today && b.due <= addDays(today, 30)).reduce((s, b) => s + b.amount, 0);
   const stc = {"da pagare": "var(--warn)", "domiciliata": "var(--sleep)", "pagata": "var(--rec)"};
-  $("#bills").innerHTML = `<div class="sec-h"><h2>Bollette e scadenze</h2></div>
+  $("#bills").innerHTML = `<div class="sec-h"><h2>Bollette e scadenze</h2><button class="newb" type="button" data-new="bill:life">+ Nuova</button></div>
     <div class="kpis" style="grid-template-columns:1fr 1fr;margin-bottom:6px"><div class="kpi"><div class="k">Da pagare, 30 giorni</div><div class="x">${eur(toPay)}</div></div><div class="kpi"><div class="k">Addebiti automatici, 30 giorni</div><div class="x">${eur(auto)}</div></div></div>` +
     bills.map(b => { const late = b.status === "da pagare" && b.due < today;
-      return `<div class="bill"><div><div class="v">${esc(b.vendor)}</div><div class="m">${late ? '<b style="color:var(--rhr)">Scaduta</b>' : "Scadenza"} ${fmtDay(b.due).toLowerCase()}${b.code ? "<br>" + esc(b.code) : ""}</div>
+      return `<div class="bill"><div><div class="v" data-eb="${b.id}">${esc(b.vendor)} <span class="note" style="font-weight:500">modifica</span></div><div class="m">${late ? '<b style="color:var(--rhr)">Scaduta</b>' : "Scadenza"} ${fmtDay(b.due).toLowerCase()}${b.code ? "<br>" + esc(b.code) : ""}</div>
         ${b.method && b.status === "da pagare" ? `<div class="m">${esc(b.method)}</div>` : ""}
         ${b.status === "da pagare" ? `<div class="paybar">${b.notice ? `<a class="pay" href="https://checkout.pagopa.it/" target="_blank" rel="noopener" data-pay="${b.id}">Paga con pagoPA</a>` : ""}<button class="link" type="button" data-paid="${b.id}">Segna pagata</button></div>` : ""}
         ${b.notice && b.status === "da pagare" ? `<div class="paydata hidden" id="pd-${b.id}"><div><span>Codice avviso</span><b>${b.notice.replace(/(\d{4})(?=\d)/g, "$1 ")}</b><button type="button" data-copy="${b.notice}">Copia</button></div><div><span>CF ente creditore</span><b>${esc(b.enteCf)}</b><button type="button" data-copy="${esc(b.enteCf)}">Copia</button></div><p>Su pagoPA scegli l’inserimento manuale dei dati: il codice avviso è già copiato, incollalo e poi inserisci il CF dell’ente. Al ritorno tocca «Segna pagata».</p></div>` : ""}</div>
-        <div class="r"><b>${eur(b.amount)}</b><span class="st" style="color:${stc[b.status]}">${b.status}</span></div></div>`; }).join("");
+        <div class="r" data-eb="${b.id}"><b>${eur(b.amount)}</b><span class="st" style="color:${stc[b.status]}">${b.status}</span></div></div>`; }).join("");
   $("#bills").querySelectorAll("[data-pay]").forEach(a => a.addEventListener("click", () => {
     const b = AG.bills.find(x => x.id === a.dataset.pay);
     copyText(b.notice);
@@ -1026,7 +1042,7 @@ function renderBrief() {
       <div><div class="k">Kcal assunte</div><div class="x">${nf0.format(kc.kcal)}</div></div></div>`;
 
   $("#priorities").innerHTML = `<div class="sec-h"><h2>Le priorità di oggi</h2><span class="note">in ordine</span></div>` + (pr.length ? pr.map((p, i) =>
-    `<div class="prow"><span class="n ${p.s >= 85 ? "hot" : ""}">${i + 1}</span><div><div class="t">${tag(p.area)}${esc(p.t)}</div><div class="m">${esc(p.m)}</div></div>
+    `<div class="prow"><span class="n ${p.s >= 85 ? "hot" : ""}">${i + 1}</span><div ${p.kind === "task" ? `data-et="${p.id}"` : ""}><div class="t">${tag(p.area)}${esc(p.t)}</div><div class="m">${esc(p.m)}</div></div>
       ${p.kind === "task" ? `<button class="link go" type="button" data-done="${p.id}">Fatto</button>` : p.kind === "mail" ? `<button class="link go" type="button" data-go="work">Apri</button>` : `<button class="link go" type="button" data-go="life">Paga</button>`}</div>`).join("")
     : `<p class="note">Nessuna priorità urgente: giornata libera da scadenze.</p>`);
   $("#priorities").querySelectorAll("[data-done]").forEach(b => b.addEventListener("click", () => { { const t = AG.tasks.find(x => x.id === b.dataset.done); t.done = true; persist.taskDone(t); } renderAll(); }));
@@ -1049,7 +1065,7 @@ function renderBrief() {
     const cls = x.free ? "free" : x.ev.area === "life" ? "life" : "";
     const state = x.e <= now ? "past" : i === nowIdx && x.s <= now ? "now" : "";
     const hm = d_ => d_.toLocaleTimeString("it-IT", {hour: "2-digit", minute: "2-digit"});
-    return `<div class="tli ${cls} ${state}"><div class="tm">${hm(x.s)}-${hm(x.e)}${state === "now" ? ", in corso" : ""}</div>
+    return `<div class="tli ${cls} ${state}" ${x.free ? "" : `data-ee="${x.ev.id}"`}><div class="tm">${hm(x.s)}-${hm(x.e)}${state === "now" ? ", in corso" : ""}</div>
       <div class="t">${x.free ? `Finestra libera di ${new Intl.NumberFormat("it-IT", {maximumFractionDigits: 1}).format(Math.round((x.e - x.s) / 60000 / 30) / 2)} ore` : tag(x.ev.area) + esc(x.ev.title)}</div></div>`;
   }).join("") : `<p class="note">Nessun impegno oggi.</p>`) + `</div>`;
 
@@ -1170,6 +1186,103 @@ Trascrivi i codici esattamente come stampati; se non li leggi con certezza metti
   renderScan();
 });
 
+const store = {
+  updateTask: t => persist.updateTask(t), deleteTask: t => persist.deleteTask(t),
+  updateEvent: e => persist.updateEvent(e), deleteEvent: e => persist.deleteEvent(e),
+  addBill: b => persist.bill(b), updateBill: b => persist.updateBill(b), deleteBill: b => persist.deleteBill(b),
+  addMeal: m => persist.meal(m), updateMeal: m => persist.updateMeal(m), deleteMeal: m => persist.mealDelete(m.id)
+};
+const tval = isoStr => isoStr ? new Date(isoStr).toTimeString().slice(0, 5) : "";
+function fieldHTML(f, v) {
+  const val = v == null ? "" : v;
+  if (f.type === "select") return `<select data-k="${f.k}">${f.options.map(([o, l]) => `<option value="${o}" ${String(o) === String(val) ? "selected" : ""}>${l}</option>`).join("")}</select>`;
+  if (f.type === "textarea") return `<textarea data-k="${f.k}" rows="3">${esc(String(val))}</textarea>`;
+  if (f.type === "checkbox") return `<input type="checkbox" data-k="${f.k}" ${val ? "checked" : ""}>`;
+  return `<input type="${f.type === "number" ? "text" : f.type || "text"}" data-k="${f.k}" value="${esc(String(val).replace(".", f.type === "number" ? "," : "."))}" ${f.type === "number" ? `inputmode="decimal"` : ""}>`;
+}
+function openForm(title, fields, values, onSave, onDelete) {
+  const rows = fields.map(f => Array.isArray(f) ? `<div class="f2">${f.map(g => `<label class="fl"><span>${g.label}</span>${fieldHTML(g, values[g.k])}</label>`).join("")}</div>`
+    : f.type === "checkbox" ? `<label class="fl chk">${fieldHTML(f, values[f.k])}<span>${f.label}</span></label>` : `<label class="fl"><span>${f.label}</span>${fieldHTML(f, values[f.k])}</label>`).join("");
+  $("#sheet-inner").innerHTML = `<div class="grab"></div><div class="hd"><h2 id="sheet-title">${esc(title)}</h2><button class="x" type="button" id="sheet-close" aria-label="Chiudi">×</button></div>
+    <div class="form">${rows}</div><div class="msg" id="f-msg"></div>
+    <div class="facts" ${onDelete ? "" : 'style="grid-template-columns:1fr"'}><button class="btn" type="button" id="f-save">Salva</button>${onDelete ? `<button class="btn sec danger" type="button" id="f-del">Elimina</button>` : ""}</div>`;
+  $("#sheet").classList.add("open"); $("#sheet-bg").classList.add("open");
+  $("#sheet-close").addEventListener("click", closeSheet);
+  $("#f-save").addEventListener("click", () => {
+    const v = {}; $("#sheet-inner").querySelectorAll("[data-k]").forEach(i => v[i.dataset.k] = i.type === "checkbox" ? i.checked : i.value.trim());
+    const err = onSave(v);
+    if (err) { $("#f-msg").textContent = err; return; }
+    closeSheet(); renderAll(); if (typeof renderNutrition === "function") renderNutrition();
+  });
+  if (onDelete) $("#f-del").addEventListener("click", () => { if (!confirm("Eliminare definitivamente?")) return; onDelete(); closeSheet(); renderAll(); if (typeof renderNutrition === "function") renderNutrition(); });
+  const first = $("#sheet-inner").querySelector("[data-k]"); if (first && !values[first.dataset.k]) first.focus();
+}
+const AREA_OPT = [["work", "Work"], ["life", "Life"]];
+function editTask(t, area) {
+  openForm(t ? "Modifica task" : "Nuovo task", [
+    {k: "title", label: "Titolo"}, {k: "area", label: "Area", type: "select", options: AREA_OPT},
+    [{k: "due", label: "Scadenza", type: "date"}, {k: "time", label: "Promemoria", type: "time"}],
+    ...(t ? [{k: "done", label: "Completato", type: "checkbox"}] : [])
+  ], t ? {title: t.title, area: t.area, due: t.due || "", time: tval(t.remind), done: t.done} : {area: area || "life", due: today},
+  v => {
+    if (!v.title) return "Inserisci un titolo.";
+    if (t) { Object.assign(t, {title: v.title, area: v.area, due: v.due || null, remind: v.due && v.time ? new Date(`${v.due}T${v.time}`).toISOString() : null, done: !!v.done}); store.updateTask(t); }
+    else addTask(v.title, v.due || null, v.time || null, v.area);
+  }, t ? () => { AG.tasks = AG.tasks.filter(x => x !== t); store.deleteTask(t); } : null);
+}
+function editEvent(e, area) {
+  const dur = e ? Math.round((new Date(e.end) - new Date(e.start)) / 60000) : 60;
+  openForm(e ? "Modifica impegno" : "Nuovo impegno", [
+    {k: "title", label: "Titolo"}, {k: "area", label: "Area", type: "select", options: AREA_OPT},
+    [{k: "date", label: "Data", type: "date"}, {k: "time", label: "Ora", type: "time"}],
+    [{k: "dur", label: "Durata (minuti)", type: "number", step: "5"}, {k: "loc", label: "Luogo"}]
+  ], e ? {title: e.title, area: e.area, date: dayOf(e.start), time: tval(e.start), dur, loc: e.location} : {area: area || "work", date: today, time: "09:00", dur: 60},
+  v => {
+    if (!v.title || !v.date || !v.time) return "Titolo, data e ora sono obbligatori.";
+    const start = new Date(`${v.date}T${v.time}`), end = new Date(start.getTime() + (+v.dur || 60) * 60000);
+    if (e) { Object.assign(e, {title: v.title, area: v.area, start: start.toISOString(), end: end.toISOString(), location: v.loc}); store.updateEvent(e); }
+    else addEvent(v.title, v.date, v.time, +v.dur || 60, v.loc, v.area);
+  }, e ? () => { AG.events = AG.events.filter(x => x !== e); store.deleteEvent(e); } : null);
+}
+function editBill(b) {
+  openForm(b ? "Modifica bolletta" : "Nuova bolletta", [
+    {k: "vendor", label: "Fornitore e descrizione"},
+    [{k: "amount", label: "Importo €", type: "number", step: "0.01"}, {k: "due", label: "Scadenza", type: "date"}],
+    {k: "status", label: "Stato", type: "select", options: [["da pagare", "Da pagare"], ["domiciliata", "Domiciliata"], ["pagata", "Pagata"]]},
+    [{k: "notice", label: "Codice avviso pagoPA"}, {k: "enteCf", label: "CF ente"}],
+    {k: "method", label: "Come si paga (se non pagoPA)"}
+  ], b ? {vendor: b.vendor, amount: b.amount, due: b.due, status: b.status, notice: b.notice || "", enteCf: b.enteCf || "", method: b.method || ""} : {status: "da pagare", due: addDays(today, 7)},
+  v => {
+    if (!v.vendor || !v.due) return "Fornitore e scadenza sono obbligatori.";
+    const data = {vendor: v.vendor, amount: +String(v.amount).replace(",", ".") || 0, due: v.due, status: v.status, notice: v.notice.replace(/\D/g, "") || null, enteCf: v.enteCf.replace(/\D/g, "") || null, method: v.method || null};
+    if (b) { Object.assign(b, data); store.updateBill(b); }
+    else { const nb = {id: uid("b"), src: "Manuale", ...data}; AG.bills.push(nb); store.addBill(nb); }
+  }, b ? () => { AG.bills = AG.bills.filter(x => x !== b); store.deleteBill(b); } : null);
+}
+function editMeal(m) {
+  openForm(m ? "Modifica pasto" : "Nuovo pasto", [
+    {k: "type", label: "Pasto", type: "select", options: TYPES.map(x => [x, x])}, {k: "title", label: "Cosa hai mangiato"},
+    [{k: "kcal", label: "Kcal", type: "number"}, {k: "protein", label: "Proteine g", type: "number"}],
+    [{k: "carbs", label: "Carboidrati g", type: "number"}, {k: "fat", label: "Grassi g", type: "number"}]
+  ], m ? {type: m.type, title: m.title, kcal: m.kcal, protein: m.protein, carbs: m.carbs, fat: m.fat} : {type: MEAL_TYPE},
+  v => {
+    if (!v.title) return "Descrivi il pasto.";
+    const n = k => Math.round(+String(v[k]).replace(",", ".") || 0);
+    const data = {type: v.type, title: v.title, kcal: n("kcal"), protein: n("protein"), carbs: n("carbs"), fat: n("fat")};
+    if (m) { Object.assign(m, data); store.updateMeal(m); }
+    else { const nm = {id: "m" + Date.now(), day: today, items: [], fiber: 0, confidence: "manuale", ...data}; MEALS.push(nm); store.addMeal(nm); }
+  }, m && !m.demo ? () => { MEALS = MEALS.filter(x => x !== m); store.deleteMeal(m); } : null);
+}
+document.addEventListener("click", ev => {
+  const n = ev.target.closest("[data-new]");
+  if (n) { const [k, a] = n.dataset.new.split(":"); if (k === "task") editTask(null, a); else if (k === "event") editEvent(null, a); else if (k === "bill") editBill(null); else if (k === "meal") editMeal(null); return; }
+  if (ev.target.closest("button:not([data-new]), a")) return;
+  const t = ev.target.closest("[data-et]"); if (t) { const x = AG.tasks.find(y => String(y.id) === t.dataset.et); if (x) editTask(x); return; }
+  const e = ev.target.closest("[data-ee]"); if (e) { const x = AG.events.find(y => String(y.id) === e.dataset.ee); if (x) editEvent(x); return; }
+  const b = ev.target.closest("[data-eb]"); if (b) { const x = AG.bills.find(y => String(y.id) === b.dataset.eb); if (x) editBill(x); return; }
+  const m = ev.target.closest("[data-em]"); if (m) { const x = MEALS.find(y => String(y.id) === m.dataset.em); if (x) editMeal(x); }
+});
+
 function renderAll() { renderAgenda(); renderBrief(); }
 const NL_PROMPT = () => `Oggi è ${new Date().toLocaleDateString("it-IT", {weekday: "long", day: "numeric", month: "long", year: "numeric"})} (${today}), ora ${new Date().toLocaleTimeString("it-IT", {hour: "2-digit", minute: "2-digit"})}.
 Trasforma la richiesta dell'utente in UN elemento di agenda. Usa "evento" se ha un orario e una durata (riunione, call, visita), "bolletta" se è un pagamento con importo, altrimenti "task".
@@ -1232,8 +1345,8 @@ function renderNutrition() {
 
   const ms = MEALS.filter(m => m.day === today).sort((a, b) => TYPES.indexOf(a.type) - TYPES.indexOf(b.type));
   $("#n-meals").innerHTML = `<h2>Pasti di oggi</h2>` + (ms.length ? ms.map(m => `<div class="meal">${m.thumb ? `<img src="${m.thumb}" alt="">` : `<div class="ph">${m.type.slice(0, 3)}</div>`}
-      <div><div class="nm">${esc(m.title)}</div><div class="mt">${m.type}, P ${m.protein} g, C ${m.carbs} g, G ${m.fat} g</div>${m.demo ? "" : `<button class="del" type="button" data-del="${m.id}">Elimina</button>`}</div>
-      <div class="kc"><b>${nf0.format(m.kcal)}</b><span class="note">kcal</span></div></div>`).join("") : `<p class="note">Nessun pasto registrato.</p>`);
+      <div data-em="${m.id}"><div class="nm">${esc(m.title)}</div><div class="mt">${m.type}, P ${m.protein} g, C ${m.carbs} g, G ${m.fat} g</div>${m.demo ? "" : `<button class="del" type="button" data-del="${m.id}">Elimina</button>`}</div>
+      <div class="kc" data-em="${m.id}"><b>${nf0.format(m.kcal)}</b><span class="note">kcal</span></div></div>`).join("") : `<p class="note">Nessun pasto registrato.</p>`);
   $("#n-meals").querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => { MEALS = MEALS.filter(m => m.id !== b.dataset.del); persist.mealDelete(b.dataset.del); renderNutrition(); }));
 
   const days = Array.from({length: 7}, (_, i) => addDays(today, i - 6));
@@ -1651,7 +1764,7 @@ function bindDietForm() {
 
 /* ---------- Coach ---------- */
 const SYSTEM = `Sei il coach personale di benessere di un atleta amatoriale che si allena per HYROX e per la corsa, seguito da un trainer.
-Lavori dentro l'app personale Agyeman e sei anche il suo assistente personale: agenda, task, bollette, posta di lavoro. Puoi creare task e appuntamenti e segnare bollette pagate con gli strumenti a disposizione, solo quando te lo chiede o lo conferma. Le domande possono arrivare dettate a voce: interpreta eventuali errori di trascrizione. Rispondi in italiano, diretto e concreto, senza frasi di cortesia e senza emoji. Usa elenchi puntati solo quando servono.
+Lavori dentro l'app personale Agyeman e sei anche il suo assistente personale: agenda, task, bollette, posta di lavoro. Puoi creare, modificare, spostare ed eliminare task e appuntamenti e segnare bollette pagate con gli strumenti a disposizione (usa gli id indicati nel contesto), solo quando te lo chiede o lo conferma. Prima di creare un task controlla che non esista già: in quel caso modificalo. Le domande possono arrivare dettate a voce: interpreta eventuali errori di trascrizione. Rispondi in italiano, diretto e concreto, senza frasi di cortesia e senza emoji. Usa elenchi puntati solo quando servono.
 Hai i suoi dati Garmin (HRV notturna RMSSD, FC a riposo, sonno, Body Battery, stress, allenamenti), il recovery calcolato dall'app.
 Regole: basati sui numeri forniti citando date e valori; se i dati non bastano dillo. Distingui correlazione e causa e segnala quando i casi sono pochi.
 Leggi l'HRV rispetto alla baseline personale. Per meditazione, respirazione, sonno, nutrizione e recupero dai protocolli pratici basati su evidenze (durata, orario, frequenza).
@@ -1672,8 +1785,8 @@ function context() {
   const mt = METRICS.slice(-30).map(x => `${x.day} | VO2max ${x.vo2max_run} | stato ${x.training_status} | acuto ${x.acute_load} cronico ${x.chronic_load} ratio ${x.load_ratio == null ? "-" : x.load_ratio.toFixed(2)} | previsioni 5k ${x.race_5k_s ? hms(x.race_5k_s) : "-"} 10k ${x.race_10k_s ? hms(x.race_10k_s) : "-"} mezza ${x.race_half_s ? hms(x.race_half_s) : "-"}`).join("\n");
   const pa = Array.from({length: 8}, (_, i) => addDays(today, i - 7)).map(dd => { const t = dayTotals(dd); const items = MEALS.filter(m => m.day === dd).map(m => `${m.type}: ${m.title} ${m.kcal} kcal`).join("; ");
     return `${dd} | assunte ${t.kcal} kcal (P ${t.protein} g, C ${t.carbs} g, G ${t.fat} g, fibre ${t.fiber} g) | consumate stima ${burned(dd)} | ${items || "nessun pasto"}`; }).join("\n");
-  const ag = `APPUNTAMENTI:\n${[...AG.events].sort((a, b) => a.start < b.start ? -1 : 1).map(e => `${e.start.slice(0, 16)} [${e.area}] ${e.title}${e.location ? " (" + e.location + ")" : ""}`).join("\n")}
-TASK APERTI:\n${AG.tasks.filter(t => !t.done).map(t => `[${t.area}] ${t.title} | scadenza ${t.due || "-"}`).join("\n")}
+  const ag = `APPUNTAMENTI:\n${[...AG.events].sort((a, b) => a.start < b.start ? -1 : 1).map(e => `${e.start.slice(0, 16)} [${e.area}] ${e.title}${e.location ? " (" + e.location + ")" : ""} {id:${e.id}}`).join("\n")}
+TASK APERTI:\n${AG.tasks.filter(t => !t.done).map(t => `[${t.area}] ${t.title} | scadenza ${t.due || "-"}${t.remind ? " promemoria " + hhmm(t.remind) : ""} {id:${t.id}}`).join("\n")}
 BOLLETTE:\n${AG.bills.map(b => `${b.vendor} | ${b.amount} EUR | scadenza ${b.due} | ${b.status}${b.notice ? " | pagabile con pagoPA, avviso " + b.notice : ""}`).join("\n")}
 POSTA DI LAVORO (sintesi):\n${AG.emails.map(m => `${m.received.slice(0, 16)} | ${m.from} | ${m.subject} | priorità ${m.tri.prio} | ${m.tri.summary}`).join("\n")}`;
   const bt = bodyTrend(), bv = bodyVerdict(bt);
@@ -1730,6 +1843,25 @@ async function ask(qText) {
       {name: "crea_appuntamento", description: "Aggiunge un appuntamento in agenda.",
         inputSchema: {type: "object", properties: {titolo: {type: "string"}, data: {type: "string"}, ora: {type: "string"}, durata_min: {type: "number"}, luogo: {type: "string"}, area: {type: "string", enum: ["work", "life"]}}, required: ["titolo", "data", "ora", "area"]},
         execute: i => { const e = addEvent(i.titolo, i.data, i.ora, i.durata_min, i.luogo, i.area); renderAll(); return {creato: e.title, inizio: e.start}; }},
+      {name: "modifica_task", description: "Modifica un task esistente: titolo, scadenza, ora del promemoria, area, completato. Usa l'id indicato nel contesto.",
+        inputSchema: {type: "object", properties: {id: {type: "string"}, titolo: {type: "string"}, data: {type: "string", description: "YYYY-MM-DD"}, ora: {type: "string", description: "HH:MM"}, area: {type: "string", enum: ["work", "life"]}, completato: {type: "boolean"}}, required: ["id"]},
+        execute: i => { const t = AG.tasks.find(x => String(x.id) === String(i.id)); if (!t) throw new Error("Task non trovato");
+          if (i.titolo) t.title = i.titolo; if (i.area) t.area = i.area; if (i.data) t.due = i.data; if (typeof i.completato === "boolean") t.done = i.completato;
+          if (i.ora && t.due) t.remind = new Date(`${t.due}T${i.ora}`).toISOString();
+          store.updateTask(t); renderAll(); return {aggiornato: t.title, scadenza: t.due}; }},
+      {name: "elimina_task", description: "Elimina un task esistente, solo se l'utente lo chiede esplicitamente.",
+        inputSchema: {type: "object", properties: {id: {type: "string"}}, required: ["id"]},
+        execute: i => { const t = AG.tasks.find(x => String(x.id) === String(i.id)); if (!t) throw new Error("Task non trovato"); AG.tasks = AG.tasks.filter(x => x !== t); store.deleteTask(t); renderAll(); return {eliminato: t.title}; }},
+      {name: "modifica_appuntamento", description: "Sposta o modifica un appuntamento esistente: titolo, data, ora, durata, luogo, area.",
+        inputSchema: {type: "object", properties: {id: {type: "string"}, titolo: {type: "string"}, data: {type: "string"}, ora: {type: "string"}, durata_min: {type: "number"}, luogo: {type: "string"}, area: {type: "string", enum: ["work", "life"]}}, required: ["id"]},
+        execute: i => { const e = AG.events.find(x => String(x.id) === String(i.id)); if (!e) throw new Error("Appuntamento non trovato");
+          const dur = i.durata_min || Math.round((new Date(e.end) - new Date(e.start)) / 60000);
+          const start = new Date(`${i.data || dayOf(e.start)}T${i.ora || tval(e.start)}`);
+          Object.assign(e, {title: i.titolo || e.title, area: i.area || e.area, location: i.luogo ?? e.location, start: start.toISOString(), end: new Date(start.getTime() + dur * 60000).toISOString()});
+          store.updateEvent(e); renderAll(); return {aggiornato: e.title, inizio: e.start}; }},
+      {name: "elimina_appuntamento", description: "Elimina un appuntamento, solo se l'utente lo chiede esplicitamente.",
+        inputSchema: {type: "object", properties: {id: {type: "string"}}, required: ["id"]},
+        execute: i => { const e = AG.events.find(x => String(x.id) === String(i.id)); if (!e) throw new Error("Appuntamento non trovato"); AG.events = AG.events.filter(x => x !== e); store.deleteEvent(e); renderAll(); return {eliminato: e.title}; }},
       {name: "segna_bolletta_pagata", description: "Segna come pagata una bolletta indicando il fornitore.",
         inputSchema: {type: "object", properties: {fornitore: {type: "string"}}, required: ["fornitore"]},
         execute: i => { const b = AG.bills.find(x => x.vendor.toLowerCase().includes(String(i.fornitore).toLowerCase())); if (!b) throw new Error("Bolletta non trovata"); b.status = "pagata"; persist.billPaid(b); renderAll(); return {pagata: b.vendor}; }}
@@ -1752,7 +1884,7 @@ const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let rec = null, listening = false;
 let TTS_ON = false;
 try { TTS_ON = localStorage.getItem("agyeman-tts") === "1"; } catch (e) {}
-const voiceMsg = t => { $("#voice-msg").textContent = t || ""; };
+const voiceMsg = t => { $("#voice-msg").textContent = t || ""; $("#q").placeholder = t || "Chiedi qualcosa"; };
 function setTTS(on) {
   TTS_ON = on; $("#tts").setAttribute("aria-pressed", on);
   try { localStorage.setItem("agyeman-tts", on ? "1" : "0"); } catch (e) {}
@@ -1771,7 +1903,7 @@ function speak(text) {
 function stopListening() { listening = false; $("#mic").setAttribute("aria-pressed", "false"); }
 function startListening() {
   if (window.speechSynthesis) speechSynthesis.cancel();
-  if (!SR) { voiceMsg("Dettatura non disponibile qui: usa il microfono della tastiera dell’iPhone."); $("#q").focus(); return; }
+  if (!SR) { voiceMsg("Usa il microfono della tastiera"); $("#q").focus(); return; }
   rec = new SR(); rec.lang = "it-IT"; rec.interimResults = true; rec.continuous = false;
   let finalText = "";
   rec.onresult = e => {
@@ -1781,12 +1913,12 @@ function startListening() {
   };
   rec.onerror = e => {
     stopListening();
-    if (e.error === "not-allowed" || e.error === "service-not-allowed") voiceMsg("Microfono non autorizzato: consenti l’accesso, oppure usa il microfono della tastiera.");
-    else if (e.error !== "no-speech" && e.error !== "aborted") voiceMsg("Dettatura interrotta, riprova.");
+    if (e.error === "not-allowed" || e.error === "service-not-allowed") voiceMsg("Microfono non autorizzato");
+    else if (e.error !== "no-speech" && e.error !== "aborted") voiceMsg("Dettatura interrotta, riprova");
   };
   rec.onend = () => { const was = listening; stopListening(); if ($("#voice-msg").textContent === "Ti ascolto...") voiceMsg(""); if (was && $("#q").value.trim()) ask(); };
   try { rec.start(); listening = true; $("#mic").setAttribute("aria-pressed", "true"); voiceMsg("Ti ascolto..."); }
-  catch (err) { stopListening(); voiceMsg("Dettatura non disponibile: usa il microfono della tastiera."); }
+  catch (err) { stopListening(); voiceMsg("Usa il microfono della tastiera"); }
 }
 $("#mic").addEventListener("click", () => {
   if (listening && rec) { rec.stop(); return; }
@@ -2044,6 +2176,30 @@ const persist = {
     if (error) return fail(error); m.id = data.id; renderNutrition();
   },
   async mealDelete(id) { const {error} = await db.from("meals").delete().eq("id", id); if (error) fail(error); },
+  async updateTask(t) {
+    if (t.ms_todo_id) { try { await invoke("ms-action", {action: "update_task", id: t.id, title: t.title, due: t.due, time: t.remind ? hhmm(t.remind) : null, done: t.done}); return; } catch (e) {} }
+    const {error} = await db.from("tasks").update({title: t.title, due: t.due, remind_at: t.remind, area: t.area, done: t.done}).eq("id", t.id); if (error) fail(error);
+  },
+  async deleteTask(t) {
+    if (t.ms_todo_id) { try { await invoke("ms-action", {action: "delete_task", id: t.id}); return; } catch (e) {} }
+    const {error} = await db.from("tasks").delete().eq("id", t.id); if (error) fail(error);
+  },
+  async updateEvent(e) {
+    const dur = Math.round((new Date(e.end) - new Date(e.start)) / 60000);
+    if (e.src === "Outlook") { try { await invoke("ms-action", {action: "update_event", id: e.id, title: e.title, date: dayOf(e.start), time: hhmm(e.start), duration_min: dur, location: e.location, area: e.area}); return; } catch (err) { fail(err); return; } }
+    const {error} = await db.from("events").update({subject: e.title, start_at: e.start, end_at: e.end, location: e.location, area: e.area}).eq("id", e.id); if (error) fail(error);
+  },
+  async deleteEvent(e) {
+    if (e.src === "Outlook") { try { await invoke("ms-action", {action: "delete_event", id: e.id}); return; } catch (err) { fail(err); return; } }
+    const {error} = await db.from("events").delete().eq("id", e.id); if (error) fail(error);
+  },
+  async updateBill(b) {
+    const {error} = await db.from("bills").update({vendor: b.vendor, amount: b.amount, due: b.due, status: b.status, notice_code: b.notice || null, ente_cf: b.enteCf || null, method: b.method || null}).eq("id", b.id); if (error) fail(error);
+  },
+  async deleteBill(b) { const {error} = await db.from("bills").delete().eq("id", b.id); if (error) fail(error); },
+  async updateMeal(m) {
+    const {error} = await db.from("meals").update({meal_type: m.type, title: m.title, kcal: m.kcal, protein_g: m.protein, carbs_g: m.carbs, fat_g: m.fat}).eq("id", m.id); if (error) fail(error);
+  },
   async chat(q, a) { const {error} = await db.from("chat_messages").insert([{role: "user", content: q}, {role: "assistant", content: a}]); if (error) fail(error); }
 };
 
