@@ -17,7 +17,6 @@ if not SUPA_URL.startswith("http"):
 SUPA_KEY = os.environ["SUPABASE_SECRET_KEY"].strip()
 
 
-
 # ---------- utilità ----------
 
 def as_plain(obj):
@@ -117,6 +116,17 @@ def login():
 
 # ---------- estrazione ----------
 
+def sleep_levels(sleep):
+    """Fasi del sonno minuto per minuto (Garmin: 0 profondo, 1 leggero, 2 REM, 3 sveglio)."""
+    items = pick(sleep, "sleepLevels", "sleep_levels") or []
+    out = []
+    for it in items if isinstance(items, list) else []:
+        s, e, lv = pick(it, "startGMT", "start_gmt"), pick(it, "endGMT", "end_gmt"), pick(it, "activityLevel", "activity_level")
+        if s and e and lv is not None:
+            out.append({"s": str(s), "e": str(e), "l": to_int(lv)})
+    return out or None
+
+
 def daily_row(garmin, day):
     ds = day.isoformat()
     stats = safe(garmin.get_stats, ds) or {}
@@ -147,12 +157,19 @@ def daily_row(garmin, day):
         "sleep_end": ms_to_iso(pick(s, "sleepEndTimestampGMT", "sleep_end_timestamp_gmt")),
         "body_battery_max": to_int(pick(stats, "bodyBatteryHighestValue", "body_battery_highest_value")),
         "body_battery_min": to_int(pick(stats, "bodyBatteryLowestValue", "body_battery_lowest_value")),
-        "stress_avg": to_int(pick(stats, "averageStressLevel", "average_stress_level")),
+        "stress_avg": (lambda v: v if v is not None and v >= 0 else None)(to_int(pick(stats, "averageStressLevel", "average_stress_level"))),
         "steps": to_int(pick(stats, "totalSteps", "total_steps")),
         "active_kcal": to_int(pick(stats, "activeKilocalories", "active_kilocalories")),
         "total_kcal": to_int(pick(stats, "totalKilocalories", "total_kilocalories")),
         "bmr_kcal": to_int(pick(stats, "bmrKilocalories", "bmr_kilocalories")),
         "training_readiness": to_int(pick(readiness, "score")),
+        "resp_avg": to_num(pick(s, "averageRespirationValue", "average_respiration_value")),
+        "spo2_avg": to_num(pick(s, "averageSpO2Value", "average_sp_o2_value", "average_spo2_value")),
+        "awake_count": to_int(pick(s, "awakeCount", "awake_count")),
+        "restless": to_int(pick(sleep, "restlessMomentsCount", "restless_moments_count")),
+        "sleep_need_min": to_int(pick(s, "sleepNeed.actual", "sleep_need.actual")),
+        "bb_change": to_int(pick(sleep, "bodyBatteryChange", "body_battery_change")),
+        "sleep_levels": sleep_levels(sleep),
         "raw": {"sleep": s, "hrv": h, "readiness": readiness},
     }
 
