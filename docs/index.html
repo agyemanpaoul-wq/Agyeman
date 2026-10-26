@@ -48,7 +48,7 @@ body{margin:0;min-height:100vh;color:var(--text);font-family:"Manrope",system-ui
   background-attachment:fixed}
 button,input,textarea{font:inherit;color:inherit}
 .num,.tile .v,.hero .value,.mini .val,.factor .row b,.stepper output{font-family:"Chakra Petch","Manrope",system-ui,sans-serif;font-variant-numeric:tabular-nums}
-.app{max-width:480px;margin:0 auto;padding:16px 16px calc(110px + env(safe-area-inset-bottom,0px))}
+.app{max-width:480px;margin:0 auto;padding:16px 16px calc(190px + env(safe-area-inset-bottom,0px))}
 header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 header h1{margin:0;font-family:"Chakra Petch",sans-serif;font-size:26px;font-weight:700;letter-spacing:.04em;display:flex;align-items:center;gap:9px}
 header h1::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--rec);box-shadow:0 0 12px var(--rec);transform:rotate(45deg)}
@@ -127,6 +127,37 @@ textarea{min-height:70px;resize:vertical}
 .tabbar button[aria-selected="true"]{color:var(--text);background:var(--surface-2)}
 .tabbar button[aria-selected="true"] svg{stroke:var(--rec);filter:drop-shadow(0 0 4px var(--rec))}
 .hidden{display:none!important}
+.sect{font-size:17px;font-weight:700;margin:20px 2px 10px}
+.askbar{position:fixed;left:14px;right:14px;bottom:calc(118px + env(safe-area-inset-bottom,0px));z-index:19;max-width:452px;margin:0 auto;display:flex;align-items:center;gap:6px;padding:5px;border:1px solid var(--line);border-radius:999px;background:color-mix(in srgb,var(--solid) 88%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.askbar input{flex:1;min-width:0;border:0;background:none;padding:10px 4px;font-size:15.5px;outline:none}
+.askbar input::placeholder{color:var(--muted)}
+.askmic,.askgo{flex:none;width:40px;height:40px;border-radius:50%;border:0;display:grid;place-items:center;cursor:pointer}
+.askmic{background:var(--surface-2)}
+.askgo{background:var(--rec)}
+.askmic svg,.askgo svg{width:20px;height:20px;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.askmic svg{stroke:var(--text)}.askgo svg{stroke:var(--on-rec)}
+.askbar:focus-within{border-color:var(--rec)}
+#v-coach.active{padding-bottom:70px}
+.mon{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.mt{display:flex;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:13px 12px 12px 14px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.mt .k{font-size:12.5px;color:var(--muted);font-weight:600}
+.mt .v{font-family:"Chakra Petch",sans-serif;font-size:25px;font-weight:700;margin-top:2px;line-height:1.15}
+.mt .v small{font-family:"Manrope",sans-serif;font-size:12px;color:var(--muted);font-weight:500;margin-left:2px}
+.mt .s{font-size:12.5px;font-weight:700;margin-top:4px}
+.rb{position:relative;width:12px;flex:none;border-radius:999px;background:var(--surface-2);margin:2px 0}
+.rb i{position:absolute;left:0;right:0;border-radius:999px;background:color-mix(in srgb,var(--rec) 45%,transparent)}
+.rb b{position:absolute;left:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--bg);border:3px solid var(--text)}
+.hyp{width:100%;height:auto;display:block;margin:6px 0 4px}
+.stg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.stg div{background:var(--surface-2);border-radius:12px;padding:8px}
+.stg span{display:block;font-size:11px;color:var(--muted)}
+.stg b{font-family:"Chakra Petch",sans-serif;font-size:16px}
+.stg em{font-style:normal;font-size:11px;color:var(--muted);display:block}
+.debt{display:flex;justify-content:space-between;gap:10px;margin-top:12px;padding:11px 12px;border-radius:14px;border:1px solid var(--line)}
+.debt .x{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:18px}
+.nr-t{font-weight:800;font-size:17px;margin-bottom:4px}
+.nr-b{font-size:14.5px;line-height:1.55;color:var(--text)}
+.nr-m{font-size:11.5px;color:var(--muted);margin-top:8px}
 .voicebar{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
 .voicebar button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer}
 .voicebar button[aria-pressed="true"]{background:var(--rec);color:var(--on-rec);border-color:transparent}
@@ -380,7 +411,7 @@ textarea{min-height:70px;resize:vertical}
 @keyframes pulse{from{opacity:.25}to{opacity:1}}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 .chips button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 12px;font-size:13px;cursor:pointer}
-.composer{position:sticky;bottom:calc(84px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;padding:8px 0}
+.composer{position:fixed;left:0;right:0;bottom:calc(118px + env(safe-area-inset-bottom,0px));z-index:19;display:flex;gap:8px;padding:8px 14px;max-width:480px;margin:0 auto;background:linear-gradient(transparent,var(--bg) 30%)}
 .composer textarea{min-height:46px;max-height:140px;border-radius:14px;background:color-mix(in srgb,var(--solid) 90%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .composer button{flex:none;width:auto;padding:0 16px}
 @media (prefers-reduced-motion: reduce){.hero .tick,.mini .arc{transition:none!important}.bubble.wait::after{animation:none}}
@@ -412,6 +443,11 @@ textarea{min-height:70px;resize:vertical}
     <div class="card hero" id="hero"></div>
     <div class="minis" id="minis"></div>
     <div class="card guide" id="guide"></div>
+    <div class="card" id="night-read"></div>
+    <h3 class="sect">Monitor della notte</h3>
+    <div class="mon" id="monitor"></div>
+    <div class="card" id="sleepcard"></div>
+    <h3 class="sect">Andamento 14 giorni</h3>
     <div class="grid" id="tiles"></div>
   </section>
 
@@ -521,6 +557,11 @@ textarea{min-height:70px;resize:vertical}
 
 </div>
 
+<div class="askbar" id="askbar">
+  <button type="button" class="askmic" id="askbar-mic" aria-label="Parla con l’assistente"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+  <input type="text" id="askbar-q" placeholder="Chiedi ad Agyeman" enterkeyhint="send" aria-label="Chiedi ad Agyeman">
+  <button type="button" class="askgo" id="askbar-go" aria-label="Invia"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+</div>
 <nav class="tabbar hidden" id="tabbar" aria-label="Sezioni">
   <div class="in" role="tablist">
     <button type="button" role="tab" data-tab="work"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/></svg>Work</button>
@@ -640,6 +681,93 @@ function renderToday() {
     ["Training readiness", d.training_readiness != null ? f0(d.training_readiness) : "--", "", "Valore Garmin", L.map(x => x.training_readiness), "var(--strain)"]
   ];
   $("#tiles").innerHTML = tiles.map(t => `<div class="tile"><div class="t">${t[0]}</div><div class="v">${t[1]}<small>${t[2]}</small></div><div class="n">${t[3]}</div>${spark(t[4], t[5])}</div>`).join("");
+  renderNight();
+}
+
+/* ---------- notte dettagliata ---------- */
+function rangeOf(key, upto, days = 30) {
+  const v = DAILY.filter(x => x.day < upto && x.day >= addDays(upto, -days)).map(x => x[key]).filter(x => x != null && x > 0);
+  if (v.length < 5) return null;
+  const m = mean(v), s = Math.max(sd(v), m * .03);
+  return {m, lo: m - s, hi: m + s, min: Math.min(...v, m - 2 * s), max: Math.max(...v, m + 2 * s)};
+}
+function monTile(label, val, unit, key, d, fmt, higherIsGood) {
+  const r = val == null ? null : rangeOf(key, d.day);
+  let st = "Dati insufficienti", col = "var(--muted)";
+  if (val == null) st = "Nessun dato";
+  else if (r) {
+    if (val > r.hi) { st = "Più elevato"; col = higherIsGood === true ? "var(--rec)" : higherIsGood === false ? "var(--warn)" : "var(--sleep)"; }
+    else if (val < r.lo) { st = "Più basso"; col = higherIsGood === true ? "var(--warn)" : higherIsGood === false ? "var(--rec)" : "var(--sleep)"; }
+    else { st = "Normale"; col = "var(--rec)"; }
+  }
+  const pos = v => r ? clamp((v - r.min) / (r.max - r.min), 0, 1) : .5;
+  const bar = r && val != null ? `<div class="rb" aria-hidden="true"><i style="bottom:${pos(r.lo) * 100}%;top:${(1 - pos(r.hi)) * 100}%"></i><b style="top:${(1 - pos(val)) * 100}%"></b></div>` : `<div class="rb" aria-hidden="true"></div>`;
+  return `<div class="mt"><div><div class="k">${label}</div><div class="v">${val == null ? "--" : fmt(val)}<small>${unit}</small></div><div class="s" style="color:${col}">${st}</div></div>${bar}</div>`;
+}
+const LV = [["Profondo", "var(--sleep)"], ["Leggero", "color-mix(in srgb,var(--sleep) 45%,var(--rec))"], ["REM", "var(--rec)"], ["Sveglio", "var(--strain)"]];
+function hypnogram(d) {
+  const L = d.sleep_levels || []; if (!L.length) return "";
+  const end = Math.max(...L.map(l => l[0] + l[1])), W = 320, H = 110, top = 8, row = 22;
+  const yOf = lv => top + [3, 2, 1, 0][lv] * row;   // sveglio in alto, profondo in basso
+  const x = m => 30 + (W - 34) * m / end;
+  let s = `<svg class="hyp" viewBox="0 0 ${W} ${H}" role="img" aria-label="Ipnogramma della notte">`;
+  ["Sveglio", "REM", "Leggero", "Prof."].forEach((t, i) => s += `<text x="0" y="${top + i * row + 12}" font-size="9.5" fill="var(--muted)">${t}</text>`);
+  L.forEach(([st, du, lv]) => s += `<rect x="${x(st)}" y="${yOf(lv) + 2}" width="${Math.max(x(st + du) - x(st), 1)}" height="${row - 4}" rx="3" fill="${LV[lv][1]}"/>`);
+  const t0 = new Date(d.sleep_start);
+  for (let hh = 0; hh <= end / 60; hh += 2) { const tt = new Date(t0.getTime() + hh * 3600000); s += `<text x="${x(hh * 60)}" y="${H - 2}" font-size="9.5" fill="var(--muted)" text-anchor="middle">${tt.getHours()}:${String(tt.getMinutes()).padStart(2, "0")}</text>`; }
+  return s + "</svg>";
+}
+function nightFallback(d, y) {
+  const need = (d.sleep_need_min || 480) * 60, debt = need - (d.sleep_seconds || 0);
+  const r = d.rec, sleepOk = debt <= 30 * 60;
+  const title = r == null ? "Notte registrata" : r >= 67 && sleepOk ? "Notte buona, recupero alto" : r >= 67 ? "Recupero alto, sonno corto" : r >= 34 && sleepOk ? "Recupero nella norma" : r >= 34 ? "Sonno da recuperare, recupero nella norma" : "Recupero basso";
+  const parts = [];
+  if (d.sleep_seconds) parts.push(`Hai dormito ${(d.sleep_seconds ? fmtDur(d.sleep_seconds) : "--")}${debt > 15 * 60 ? `, ${fmtDur(debt)} in meno del tuo fabbisogno` : ", in linea con il fabbisogno"}.`);
+  const hr = rangeOf("hrv_night", d.day);
+  if (d.hrv_night && hr) parts.push(`HRV ${d.hrv_night} ms ${d.hrv_night < hr.lo ? "sotto" : d.hrv_night > hr.hi ? "sopra" : "nella"} ${d.hrv_night < hr.lo || d.hrv_night > hr.hi ? "la tua media" : "tua norma"}.`);
+  parts.push(r == null ? "" : r >= 67 ? "Puoi spingere oggi." : r >= 34 ? "Carico moderato, e stasera punta ad andare a letto prima." : "Oggi meglio recupero attivo.");
+  return {title, text: parts.filter(Boolean).join(" ")};
+}
+let NIGHT_AI = null;
+try { const n = JSON.parse(localStorage.getItem("agyeman-night") || "null"); if (n && n.day === today) NIGHT_AI = n; } catch (e) {}
+let nightBusy = false;
+async function nightAI(d) {
+  if (NIGHT_AI || nightBusy || !sample || !d || d.day !== today) return;
+  nightBusy = true;
+  try {
+    const r = await sample.json(`${context()}\n\nCOMPITO: scrivi la lettura della notte appena passata (${d.day}) come farebbe un coach del sonno, basandoti su durata, fasi, HRV, FC a riposo, respirazione, SpO2, risvegli e fabbisogno di sonno confrontati con le medie personali, e sugli impegni e allenamenti di oggi.
+Rispondi SOLO con JSON: {"titolo":"massimo 6 parole","testo":"2-3 frasi concrete: cosa dice la notte e cosa fare oggi e stasera"}`, {cache: false, modelTier: "quick"});
+    if (r && r.testo) { NIGHT_AI = {day: today, title: r.titolo || "", text: r.testo}; try { localStorage.setItem("agyeman-night", JSON.stringify(NIGHT_AI)); } catch (e) {} renderNight(); }
+  } catch (e) {} finally { nightBusy = false; }
+}
+function renderNight() {
+  if (!DAILY.length) { ["#night-read", "#monitor", "#sleepcard"].forEach(id => $(id).innerHTML = ""); return; }
+  const d = BYDAY.get(today) || DAILY[DAILY.length - 1], y = DAILY[DAILY.indexOf(d) - 1];
+  const fb = nightFallback(d, y), shown = NIGHT_AI && NIGHT_AI.day === d.day ? NIGHT_AI : fb;
+  $("#night-read").innerHTML = `<div class="nr-t">${esc(shown.title)}</div><div class="nr-b">${esc(shown.text)}</div><div class="nr-m">${shown === fb ? "Lettura automatica dei dati" : "Lettura di Agyeman AI"}, notte del ${parseDay(d.day).toLocaleDateString("it-IT", {day: "numeric", month: "long"})}</div>`;
+  $("#monitor").innerHTML = [
+    monTile("FR", d.resp_avg, " atti/min", "resp_avg", d, v => nf1.format(v), null),
+    monTile("FCR", d.resting_hr, " bpm", "resting_hr", d, v => nf0.format(v), false),
+    monTile("HRV", d.hrv_night, " ms", "hrv_night", d, v => nf0.format(v), true),
+    monTile("SpO2", d.spo2_avg, " %", "spo2_avg", d, v => nf0.format(v), true),
+    monTile("Sonno", d.sleep_seconds, "", "sleep_seconds", d, v => fmtDur(v), true),
+    monTile("Risvegli", d.awake_count, "", "awake_count", d, v => nf0.format(v), false)
+  ].join("");
+  if (!d.sleep_seconds) { $("#sleepcard").innerHTML = `<h2>Sonno</h2><p class="note">Nessun sonno registrato per questa notte.</p>`; return; }
+  const deep = d.deep_seconds || 0, rem = d.rem_seconds || 0, awake = d.awake_seconds || 0, light = Math.max(0, d.sleep_seconds - deep - rem);
+  const pct = v => nf0.format(v / d.sleep_seconds * 100) + "%";
+  const need = (d.sleep_need_min || 480) * 60, debt = need - d.sleep_seconds;
+  const t = s => s ? new Date(s).toLocaleTimeString("it-IT", {hour: "2-digit", minute: "2-digit"}) : "--";
+  $("#sleepcard").innerHTML = `<div class="sec-h"><h2>Sonno</h2><span class="note">${t(d.sleep_start)} - ${t(d.sleep_end)}${d.sleep_score ? `, score ${d.sleep_score}` : ""}</span></div>
+    ${hypnogram(d)}
+    <div class="stg">
+      <div><span>Profondo</span><b>${fmtDur(deep)}</b><em>${pct(deep)}</em></div>
+      <div><span>Leggero</span><b>${fmtDur(light)}</b><em>${pct(light)}</em></div>
+      <div><span>REM</span><b>${fmtDur(rem)}</b><em>${pct(rem)}</em></div>
+      <div><span>Sveglio</span><b>${fmtDur(awake)}</b><em>${d.awake_count != null ? d.awake_count + (d.awake_count === 1 ? " risveglio" : " risvegli") : ""}</em></div></div>
+    <div class="debt"><div><div class="note" style="font-size:12px">Fabbisogno ${fmtDur(need)}${d.sleep_need_min ? "" : " (stima)"}</div><div>${debt > 0 ? "Debito di sonno" : "Fabbisogno coperto"}</div></div><div class="x" style="color:${debt > 45 * 60 ? "var(--warn)" : "var(--rec)"}">${debt > 0 ? fmtDur(debt) : "+" + fmtDur(-debt)}</div></div>
+    ${d.bb_change != null || d.restless != null ? `<p class="note" style="margin:10px 0 0">${d.bb_change != null ? `Body Battery ricaricata di ${d.bb_change} punti durante la notte. ` : ""}${d.restless != null ? `${d.restless} momenti di agitazione.` : ""}</p>` : ""}`;
+  nightAI(d);
 }
 
 /* ---------- Allenamenti ---------- */
@@ -1531,7 +1659,7 @@ Non fare diagnosi: sulle analisi del sangue spiega i valori rispetto ai riferime
 Risposte brevi per domande semplici.`;
 const hm = s => s ? `${Math.floor(s / 3600)}h${String(Math.round(s % 3600 / 60)).padStart(2, "0")}` : "-";
 function context() {
-  const d = DAILY.map(x => `${x.day} | recovery ${x.rec == null ? "-" : Math.round(x.rec)} | HRV ${x.hrv_night} (7g ${x.hrv_weekly}, ${x.hrv_status}) | FCr ${x.resting_hr} | sonno ${hm(x.sleep_seconds)} prof ${hm(x.deep_seconds)} REM ${hm(x.rem_seconds)} score ${x.sleep_score} | BB ${x.body_battery_max} | stress ${x.stress_avg} | readiness ${x.training_readiness ?? "-"}`).join("\n");
+  const d = DAILY.map(x => `${x.day} | ${x.resp_avg ? "resp " + x.resp_avg + " | " : ""}${x.spo2_avg ? "SpO2 " + x.spo2_avg + " | " : ""}${x.awake_count != null ? "risvegli " + x.awake_count + " | " : ""}${x.sleep_need_min ? "fabbisogno sonno " + x.sleep_need_min + " min | " : ""}recovery ${x.rec == null ? "-" : Math.round(x.rec)} | HRV ${x.hrv_night} (7g ${x.hrv_weekly}, ${x.hrv_status}) | FCr ${x.resting_hr} | sonno ${hm(x.sleep_seconds)} prof ${hm(x.deep_seconds)} REM ${hm(x.rem_seconds)} score ${x.sleep_score} | BB ${x.body_battery_max} | stress ${x.stress_avg} | readiness ${x.training_readiness ?? "-"}`).join("\n");
   const a = ACTS.map(x => {
     let s = `${x.start_local} | ${x.name} | ${x.duration_min} min`;
     if (isRun(x)) s += ` | ${km(x.distance_m)} km a ${pace(x.avg_pace)}/km | cadenza ${x.avg_cadence} | disl ${x.elev_gain} m`;
@@ -1585,8 +1713,9 @@ async function ask(qText) {
   const q = (qText ?? $("#q").value).trim();
   if (!q || busy || !sample) return;
   busy = true; $("#q").value = ""; $("#ask").disabled = true;
-  bubble("user", esc(q));
+  bubble("user", esc(q.replace(/^\[Domanda fatta dalla sezione [^\]]+\]\s*/, "")));
   const out = bubble("assistant wait", "Sto analizzando i tuoi dati...");
+  setTimeout(() => window.scrollTo({top: document.body.scrollHeight, behavior: "smooth"}), 50);
   out.scrollIntoView({behavior: "smooth", block: "end"});
   const turns = HISTORY.slice(-8);
   while (turns.length && turns[0].role !== "user") turns.shift();
@@ -1672,6 +1801,18 @@ bubble("assistant", md("Sono il tuo assistente. Vedo salute, allenamenti, pasti,
 const TOP = ["work", "wellness", "agenda", "life", "coach"], WELL = ["oggi", "allenamenti", "pasti", "corpo"];
 const ALIAS = {sport: "allenamenti", giornata: "agenda"};
 let WSUB = "oggi";
+const SECT_LABEL = {work: "Work", agenda: "Giornata", life: "Life", oggi: "Wellness > Oggi", allenamenti: "Wellness > Sport", pasti: "Wellness > Pasti", corpo: "Wellness > Corpo"};
+let CUR_VIEW = "agenda";
+function askFromBar() {
+  const q = $("#askbar-q").value.trim(); if (!q) return;
+  const from = SECT_LABEL[CUR_VIEW];
+  $("#askbar-q").value = ""; $("#askbar-q").blur();
+  show("coach");
+  ask(from ? `[Domanda fatta dalla sezione ${from}] ${q}` : q);
+}
+$("#askbar-go").addEventListener("click", askFromBar);
+$("#askbar-q").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); askFromBar(); } });
+$("#askbar-mic").addEventListener("click", () => { show("coach"); voiceMsg(""); startListening(); });
 function show(name) {
   name = ALIAS[name] || name;
   let top = name, view = name;
@@ -1682,6 +1823,8 @@ function show(name) {
   $("#subnav").classList.toggle("hidden", top !== "wellness");
   document.querySelectorAll("#subnav button").forEach(b => b.setAttribute("aria-selected", b.dataset.sub === WSUB));
   document.querySelectorAll(".tabbar button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === top));
+  CUR_VIEW = view;
+  $("#askbar").classList.toggle("hidden", view === "coach");
   window.scrollTo(0, 0);
 }
 document.querySelectorAll(".tabbar button").forEach(b => b.addEventListener("click", () => show(b.dataset.tab)));
@@ -1799,7 +1942,7 @@ function fallbackMetrics() {
 async function loadAll() {
   const from = addDays(today, -120), since = d => new Date(Date.now() - d * 864e5).toISOString();
   const res = await Promise.all([
-    db.from("daily").select("day,hrv_night,hrv_weekly,hrv_status,resting_hr,sleep_seconds,deep_seconds,rem_seconds,awake_seconds,sleep_score,body_battery_max,stress_avg,steps,active_kcal,total_kcal,bmr_kcal,training_readiness,updated_at").gte("day", from).order("day"),
+    db.from("daily").select("day,hrv_night,hrv_weekly,hrv_status,resting_hr,sleep_seconds,deep_seconds,rem_seconds,awake_seconds,sleep_score,sleep_start,sleep_end,body_battery_max,stress_avg,steps,active_kcal,total_kcal,bmr_kcal,training_readiness,resp_avg,spo2_avg,awake_count,restless,sleep_need_min,bb_change,sleep_levels,updated_at").gte("day", from).order("day"),
     db.from("activities").select("id,start_local,type_key,name,duration_s,avg_hr,max_hr,kcal,training_load,aerobic_te,anaerobic_te,distance_m,avg_speed,avg_cadence,elev_gain,vo2max,te_label,hr_zones,splits").gte("start_local", from).order("start_local"),
     db.from("metrics").select("*").gte("day", from).order("day"),
     db.from("records").select("*"),
@@ -1821,7 +1964,15 @@ async function loadAll() {
   LABS = lb.map(x => ({id: x.id, date: x.date, lab: x.lab || "", items: Array.isArray(x.items) ? x.items : []}));
   DIET = dp.length ? dp[0].plan : null;
 
-  DAILY = d.map(x => ({...x, hrv_night: num(x.hrv_night), hrv_weekly: num(x.hrv_weekly), resting_hr: num(x.resting_hr)}));
+  DAILY = d.map(x => {
+    const st = x.sleep_start ? new Date(x.sleep_start).getTime() : null;
+    const lv = Array.isArray(x.sleep_levels) && st ? x.sleep_levels.map(l => {
+      const s = new Date(String(l.s).replace(" ", "T") + (/[zZ+]/.test(String(l.s).slice(10)) ? "" : "Z")).getTime(), e = new Date(String(l.e).replace(" ", "T") + (/[zZ+]/.test(String(l.e).slice(10)) ? "" : "Z")).getTime();
+      return [Math.round((s - st) / 60000), Math.max(1, Math.round((e - s) / 60000)), Math.round(+l.l)];
+    }).filter(l => l[2] >= 0 && l[2] <= 3 && l[0] >= -60) : null;
+    return {...x, hrv_night: num(x.hrv_night), hrv_weekly: num(x.hrv_weekly), resting_hr: num(x.resting_hr) && num(x.resting_hr) >= 35 ? num(x.resting_hr) : null,
+      stress_avg: x.stress_avg != null && x.stress_avg >= 0 ? x.stress_avg : null, resp_avg: num(x.resp_avg), spo2_avg: num(x.spo2_avg), sleep_levels: lv && lv.length ? lv : null};
+  });
   DAILY.forEach((x, i) => {
     const win = DAILY.slice(Math.max(0, i - 30), i);
     x.rec = recovery(x.hrv_night, x.resting_hr, x.sleep_score, win.map(y => y.hrv_night).filter(v => v > 0), win.map(y => y.resting_hr).filter(v => v > 0));
